@@ -1,6 +1,6 @@
 # 📬 Customer Feedback Routing System
 
-An AI Agent-powered agentic workflow built on **n8n** that automatically classifies incoming customer feedback and routes it to the correct department — notifying the team on Slack, logging the record to Airtable, and sending the customer a personalised acknowledgement email, all without any human triage.
+An AI Agent-powered agentic workflow built on n8n that automatically classifies incoming customer feedback and routes it to the correct department — notifying the team on Slack, logging the record to Airtable, and sending the customer a personalised acknowledgement email, all without any human triage.
 
 ## 📖 Overview
 
