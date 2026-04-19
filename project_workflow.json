@@ -1,0 +1,1181 @@
+{
+  "name": "Customer Feedback Routing System",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Share Your Feedback",
+        "formDescription": "We'd love to hear from you.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name:",
+              "placeholder": "Enter your name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email id:",
+              "fieldType": "email",
+              "placeholder": "Enter your email id",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Message:",
+              "fieldType": "textarea",
+              "placeholder": "Write your questions, suggestions, or comments.",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Your response has been recorded!"
+            }
+          },
+          "customCss": ":root {\n    --font-family: 'Cambria';\n    --font-size-header: 33px;\n    --font-size-subheader: 30px;\n    --font-size-label: 18px;\n    --font-size-input: 18px;\n    --color-background: linear-gradient(135deg, #fceddf, #f2d1b3);\n    --color-card-bg: #ffffff;\n    --box-shadow-card: 0 18px 36px rgba(0, 0, 0, 0.08);\n    --color-header: #1f2937;\n    --color-header-subtext: #6b7280;\n    --color-label: #374151;\n    --color-input-border: #e5e7eb;\n    --color-focus-border: #6366f1;\n    --textarea-height: 120px;\n    --color-submit-btn-bg: black;\n    --color-submit-btn-text: white;\n    --border-radius-card: 16px;\n    --border-radius-input: 10px;\n    --container-width: 600px;\n    --submit-btn-height: 48px;\n    --padding-card: 26px;\n}\n\nbody {\n    display: flex;\n    flex-direction: column;\n    min-height: 100vh;\n}\n\nbody::before {\n    content: \"Customer Feedback Routing System\";\n    display: block;\n    text-align: center;\n    margin-top: 30px;\n    margin-bottom: 10px;\n    font-family: var(--font-family);\n    color: var(--color-header);\n    font-size: 42px;\n    font-weight: bold;\n    width: 100%;\n}\n\nbody::after {\n    content: \"Copyright © 2026 Anand Shenoy. All Rights Reserved.\";\n    display: block;\n    text-align: center;\n    margin-top: 20px;\n    margin-bottom: 20px;\n    padding-bottom: 20px;\n    font-family: var(--font-family);\n    color: var(--color-header-subtext);\n    font-size: 18px;\n    width: 100%;\n}\n\ntextarea {\n    min-height: var(--textarea-height);\n}\n\nbutton[type=\"submit\"] {\n    width: 30% !important;\n    margin: 0 auto !important;\n    display: block !important;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        112
+      ],
+      "id": "e3e98bcd-852d-488b-a14c-f5908f7bb572",
+      "name": "Feedback form",
+      "webhookId": "f9fb24af-3a5a-4709-b950-5c430b7e2ca7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a customer feedback analyzer for a company with the following departments:\n\nProduct & Research\nTechnical Support\nCustomer Support\nBilling & Finance\nLegal & Compliance\n\nYour task is to determine which department the given customer feedback should be routed to.\n\nThe feedback is as follows:\n{{ $json['Message:'] }}\n\nYour response should only contain one of the given department names.\n\nStrictly do not provide any description, explanation, or additional text in the response.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        252
+      ],
+      "id": "35171ce8-60dd-478c-b406-9689451cf970",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        224,
+        480
+      ],
+      "id": "bc245465-a5fb-47b4-9558-74b4bf9df742",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "4Qubnbn0DcXedmr3",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        576,
+        128
+      ],
+      "id": "e7c73902-f3e4-40a3-a008-c5433cd1286a",
+      "name": "Data Integration"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Product & Research",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ce98e316-9226-4694-9f44-b0560a43c11c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a55c7787-6821-47a9-affb-6a93c1cbef7b",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Technical Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "37b6e3c6-2b99-4b77-848b-45b11f51c5de",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Customer Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0cac044c-24b4-4bba-a19f-c50e01b933d8",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Billing & Finance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d0ef7d4a-9640-4ce7-a09d-08a1b405460b",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Legal & Compliance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        80
+      ],
+      "id": "f60cb635-165d-4af1-bc0b-3a3bc3fb4b33",
+      "name": "Department Routing"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfDxvzOsunvmNGa",
+          "mode": "list",
+          "cachedResultName": "Customer Feedback Data",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblg7p8w68pCdYfE1",
+          "mode": "list",
+          "cachedResultName": "Product & Research",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa/tblg7p8w68pCdYfE1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Name": "={{ $json['Name:'] }}",
+            "Email id": "={{ $json['Email id:'] }}",
+            "Message": "={{ $json['Message:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        -256
+      ],
+      "id": "e193dcec-4d20-4e92-b728-eacf4e32d4ed",
+      "name": "Product & Research Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "mlP2Si1rIwfVrU07",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfDxvzOsunvmNGa",
+          "mode": "list",
+          "cachedResultName": "Customer Feedback Data",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblM9wmJOATEUdvvZ",
+          "mode": "list",
+          "cachedResultName": "Technical Support",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa/tblM9wmJOATEUdvvZ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Name": "={{ $json['Name:'] }}",
+            "Email id": "={{ $json['Email id:'] }}",
+            "Message": "={{ $json['Message:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        -64
+      ],
+      "id": "40d02017-35a8-4322-b6d9-518b153aa01f",
+      "name": "Technical Support Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "mlP2Si1rIwfVrU07",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfDxvzOsunvmNGa",
+          "mode": "list",
+          "cachedResultName": "Customer Feedback Data",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQcJWK90v3ktslP",
+          "mode": "list",
+          "cachedResultName": "Customer Support",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa/tblQcJWK90v3ktslP"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Name": "={{ $json['Name:'] }}",
+            "Email id": "={{ $json['Email id:'] }}",
+            "Message": "={{ $json['Message:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        128
+      ],
+      "id": "56ecf6d1-ccd3-4de5-8d81-427b5d2c12bc",
+      "name": "Customer Support Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "mlP2Si1rIwfVrU07",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfDxvzOsunvmNGa",
+          "mode": "list",
+          "cachedResultName": "Customer Feedback Data",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblqMXQ3OCGcNWCc4",
+          "mode": "list",
+          "cachedResultName": "Billing & Finance",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa/tblqMXQ3OCGcNWCc4"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Name": "={{ $json['Name:'] }}",
+            "Email id": "={{ $json['Email id:'] }}",
+            "Message": "={{ $json['Message:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        320
+      ],
+      "id": "440c09ed-7759-454b-8105-c84d7c0b8016",
+      "name": "Billing & Finance Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "mlP2Si1rIwfVrU07",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfDxvzOsunvmNGa",
+          "mode": "list",
+          "cachedResultName": "Customer Feedback Data",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltRDdx6XRjK2nPy",
+          "mode": "list",
+          "cachedResultName": "Legal & Compliance",
+          "cachedResultUrl": "https://airtable.com/appfDxvzOsunvmNGa/tbltRDdx6XRjK2nPy"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Name": "={{ $json['Name:'] }}",
+            "Email id": "={{ $json['Email id:'] }}",
+            "Message": "={{ $json['Message:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        512
+      ],
+      "id": "3d55859d-73c6-4436-81d1-126510b4bccd",
+      "name": "Legal & Compliance Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "mlP2Si1rIwfVrU07",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ATWJJ8UP4",
+          "mode": "list",
+          "cachedResultName": "product-and-research-team"
+        },
+        "text": "=Recieved Feedback:\n\nName: {{ $json.fields.Name }}\nEmail id: {{ $json.fields['Email id'] }}\nMessage: {{ $json.fields.Message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1248,
+        -256
+      ],
+      "id": "d9dff3b1-5a66-443e-8cf3-eec7300677ec",
+      "name": "Product & Research Team Channel",
+      "webhookId": "4854102a-5eea-4a08-ac22-4babb5e6dfb0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4uZG0xmMstk32QId",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ATERNQFRD",
+          "mode": "list",
+          "cachedResultName": "techinal-support-team"
+        },
+        "text": "=Recieved Feedback:\n\nName: {{ $json.fields.Name }}\nEmail id: {{ $json.fields['Email id'] }}\nMessage: {{ $json.fields.Message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1248,
+        -64
+      ],
+      "id": "43c8dc7d-2d1f-4f31-8c25-2659481fb7d3",
+      "name": "Technical Support Team Channel",
+      "webhookId": "4854102a-5eea-4a08-ac22-4babb5e6dfb0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4uZG0xmMstk32QId",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ATPP6L6F5",
+          "mode": "list",
+          "cachedResultName": "customer-support-team"
+        },
+        "text": "=Recieved Feedback:\n\nName: {{ $json.fields.Name }}\nEmail id: {{ $json.fields['Email id'] }}\nMessage: {{ $json.fields.Message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1248,
+        128
+      ],
+      "id": "6bd76ba0-64e8-4e31-979a-c2933380b110",
+      "name": "Customer Support Team Channel",
+      "webhookId": "4854102a-5eea-4a08-ac22-4babb5e6dfb0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4uZG0xmMstk32QId",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ATW4WB7B4",
+          "mode": "list",
+          "cachedResultName": "billing-and-finance-team"
+        },
+        "text": "=Recieved Feedback:\n\nName: {{ $json.fields.Name }}\nEmail id: {{ $json.fields['Email id'] }}\nMessage: {{ $json.fields.Message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1248,
+        320
+      ],
+      "id": "5456b39f-6a81-4b4b-9723-ff985ba1ce51",
+      "name": "Billing & Finance Team Channel",
+      "webhookId": "4854102a-5eea-4a08-ac22-4babb5e6dfb0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4uZG0xmMstk32QId",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AU923KB1P",
+          "mode": "list",
+          "cachedResultName": "legal-and-compliance-team"
+        },
+        "text": "=Recieved Feedback:\n\nName: {{ $json.fields.Name }}\nEmail id: {{ $json.fields['Email id'] }}\nMessage: {{ $json.fields.Message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1248,
+        512
+      ],
+      "id": "929ac749-efd2-4b53-966a-b25ddf7ae1d5",
+      "name": "Legal & Compliance Team Channel",
+      "webhookId": "4854102a-5eea-4a08-ac22-4babb5e6dfb0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "4uZG0xmMstk32QId",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Integration').item.json['Email id:'] }}",
+        "subject": "=Thank you for your feedback! - {{ $('Data Integration').item.json.output }} Team",
+        "message": "=Hi {{ $('Data Integration').item.json['Name:'] }},<br><br>\n\nThank you for taking the time to fill out our feedback form. We have safely received your message!<br><br>\n\nBecause your message touches on our AI models, features, or product capabilities, it has been automatically routed to the {{ $('Department Routing').item.json.output }} team. We are constantly reviewing real-world usage to improve our systems, and a team member is currently reviewing your thoughts.<br><br>\n\nWe appreciate your input and will reach out if we need any further details.<br><br>\n\nBest regards,<br>\n{{ $('Department Routing').item.json.output }} Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        -256
+      ],
+      "id": "81375cb7-d882-465f-9610-f502b19534a6",
+      "name": "PR Response to the Customer",
+      "webhookId": "f0c802ac-215d-4c9e-a6bb-57274712853f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nB3Lip2Oz2PUtCZU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Integration').item.json['Email id:'] }}",
+        "subject": "=Thank you for your feedback! - {{ $('Data Integration').item.json.output }} Team",
+        "message": "=Hi {{ $('Data Integration').item.json['Name:'] }},<br><br>\n\nThank you for taking the time to fill out our feedback form. We have safely received your message!<br><br>\n\nBecause your message indicates a potential system error or technical roadblock, it has been automatically routed to the {{ $('Department Routing').item.json.output }} team. A support specialist is reviewing your details to help get this sorted out, and we aim to resolve technical blockers as quickly as possible.<br><br>\n\nWe appreciate your input and will reach out if we need any further details.<br><br>\n\nBest regards,<br>\n{{ $('Department Routing').item.json.output }} Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        -64
+      ],
+      "id": "589843dd-d374-4e70-a932-33b6b784e255",
+      "name": "TS Response to the Customer",
+      "webhookId": "f0c802ac-215d-4c9e-a6bb-57274712853f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nB3Lip2Oz2PUtCZU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Integration').item.json['Email id:'] }}",
+        "subject": "=Thank you for your feedback! - {{ $('Data Integration').item.json.output }} Team",
+        "message": "=Hi {{ $('Data Integration').item.json['Name:'] }},<br><br>\n\nThank you for taking the time to fill out our feedback form. We have safely received your message!<br><br>\n\nBecause your message is a general inquiry or request for guidance, it has been automatically routed to the {{ $('Department Routing').item.json.output }} team. One of our specialists is currently reviewing your comments and will be ready to assist you further.<br><br>\n\nWe appreciate your input and will reach out if we need any further details.<br><br>\n\nBest regards,<br>\n{{ $('Department Routing').item.json.output }} Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        128
+      ],
+      "id": "750fa18c-c297-4288-8df7-5c1a87e4a149",
+      "name": "CS Response to the Customer",
+      "webhookId": "f0c802ac-215d-4c9e-a6bb-57274712853f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nB3Lip2Oz2PUtCZU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Integration').item.json['Email id:'] }}",
+        "subject": "=Thank you for your feedback! - {{ $('Data Integration').item.json.output }} Team",
+        "message": "=Hi {{ $('Data Integration').item.json['Name:'] }},<br><br>\n\nThank you for taking the time to fill out our feedback form. We have safely received your message!<br><br>\n\nBecause your message contains information regarding invoices, subscriptions, or payments, it has been automatically routed to the {{ $('Department Routing').item.json.output }} team. We are currently pulling up your account details to review your inquiry and ensure everything is accurate.<br><br>\n\nWe appreciate your input and will reach out if we need any further details.<br><br>\n\nBest regards,<br>\n{{ $('Department Routing').item.json.output }} Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        320
+      ],
+      "id": "5ebf749d-f964-4be6-a4fc-c6d237ddb0c3",
+      "name": "BF Response to the Customer",
+      "webhookId": "f0c802ac-215d-4c9e-a6bb-57274712853f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nB3Lip2Oz2PUtCZU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Data Integration').item.json['Email id:'] }}",
+        "subject": "=Thank you for your feedback! - {{ $('Data Integration').item.json.output }} Team",
+        "message": "=Hi {{ $('Data Integration').item.json['Name:'] }},<br><br>\n\nThank you for taking the time to fill out our feedback form. We have safely received your message!<br><br>\n\nBecause your inquiry pertains to privacy, data handling, or terms of service, it has been automatically routed to the {{ $('Department Routing').item.json.output }} team. We take these matters seriously, and your request has been securely logged for formal review by a compliance officer.<br><br>\n\nWe appreciate your input and will reach out if we need any further details.<br><br>\n\nBest regards,<br>\n{{ $('Department Routing').item.json.output }} Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        512
+      ],
+      "id": "7184d60d-dccc-4cd3-a65a-bd3b69af8888",
+      "name": "LC Response to the Customer",
+      "webhookId": "f0c802ac-215d-4c9e-a6bb-57274712853f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nB3Lip2Oz2PUtCZU",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Feedback form": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Data Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Data Integration",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Data Integration": {
+      "main": [
+        [
+          {
+            "node": "Department Routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Department Routing": {
+      "main": [
+        [
+          {
+            "node": "Product & Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Technical Support Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Customer Support Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Billing & Finance Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Legal & Compliance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product & Research Data": {
+      "main": [
+        [
+          {
+            "node": "Product & Research Team Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Technical Support Data": {
+      "main": [
+        [
+          {
+            "node": "Technical Support Team Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Support Data": {
+      "main": [
+        [
+          {
+            "node": "Customer Support Team Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Billing & Finance Data": {
+      "main": [
+        [
+          {
+            "node": "Billing & Finance Team Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Legal & Compliance Data": {
+      "main": [
+        [
+          {
+            "node": "Legal & Compliance Team Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product & Research Team Channel": {
+      "main": [
+        [
+          {
+            "node": "PR Response to the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Technical Support Team Channel": {
+      "main": [
+        [
+          {
+            "node": "TS Response to the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Support Team Channel": {
+      "main": [
+        [
+          {
+            "node": "CS Response to the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Billing & Finance Team Channel": {
+      "main": [
+        [
+          {
+            "node": "BF Response to the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Legal & Compliance Team Channel": {
+      "main": [
+        [
+          {
+            "node": "LC Response to the Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "330c2fa5-fc7b-4d90-b94c-dc16c3b8ccd2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "30407d971dd9b59dc64fe9f24800312cf653e83acd55de90df799bd75f310be8"
+  },
+  "id": "TjVdzyC5vlQ089WR",
+  "tags": []
+}
